@@ -1,3 +1,4 @@
+// ...existing code...
 <!doctype html>
 <html lang="fr">
 <head>
@@ -33,7 +34,16 @@
         form{display:grid; gap:10px;}
         input,textarea{width:100%; padding:10px; border:1px solid #e6eef8; border-radius:8px; font:inherit}
         footer{margin:28px 0; color:var(--muted); text-align:center; font-size:0.9rem}
-        @media (max-width:560px){ .hero{flex-direction:column; align-items:flex-start} header{flex-direction:column; align-items:flex-start} }
+
+        /* Nouveaux styles pour le journal et les toasts */
+        .events-controls{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+        .event-list{max-height:280px; overflow:auto; padding:8px; border-radius:8px; border:1px solid #eef2fb; background:#fbfdff}
+        .event-item{padding:8px; border-bottom:1px solid #eef3fb; font-size:.9rem}
+        .event-item:last-child{border-bottom:0}
+        .event-meta{color:var(--muted); font-size:.8rem}
+        .toast-wrap{position:fixed; top:16px; right:16px; z-index:9999; display:flex; flex-direction:column; gap:8px}
+        .toast{background:#0f172a;color:#fff;padding:10px 12px;border-radius:8px;box-shadow:0 6px 20px rgba(15,23,42,.18);opacity:.98;font-weight:600}
+        @media (max-width:560px){ .hero{flex-direction:column; align-items:flex-start} header{flex-direction:column; align-items:flex-start} .toast-wrap{right:8px;left:8px} }
     </style>
 </head>
 <body>
@@ -100,6 +110,22 @@
                     <div id="formStatus" class="muted" role="status" aria-live="polite" style="margin-top:6px"></div>
                 </form>
             </section>
+
+            <!-- NOUVEL ESPACE: Journal des événements -->
+            <section id="events" class="card" aria-labelledby="events-title" style="margin-top:18px">
+                <h3 id="events-title">Journal des événements</h3>
+
+                <div class="events-controls" aria-hidden="false">
+                    <button class="btn" id="simOverheat">Simuler surchauffe</button>
+                    <button class="btn" id="simOverload">Simuler surcharge</button>
+                    <button class="btn" id="simModify" style="background:#10b981">Simuler modification</button>
+                    <button class="btn" id="clearLog" style="background:#64748b">Effacer le journal</button>
+                    <button class="btn" id="exportLog" style="background:#111827">Exporter</button>
+                </div>
+
+                <div id="eventList" class="event-list" role="log" aria-live="polite"></div>
+                <div class="muted" style="margin-top:8px; font-size:.85rem">Les événements sont stockés localement (localStorage) et persistants.</div>
+            </section>
         </main>
 
         <footer>
@@ -107,18 +133,138 @@
         </footer>
     </div>
 
+    <div class="toast-wrap" id="toastWrap" aria-hidden="true"></div>
+
     <script>
         // année dynamique
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        // gestion simple du formulaire (prévention d'envoi réel)
+        // --- EXISTING FORM HANDLER (modifié pour logger) ---
         document.getElementById('contactForm').addEventListener('submit', function(e){
             e.preventDefault();
             const status = document.getElementById('formStatus');
             status.textContent = 'Merci ! Votre message a été pris en compte (simulation).';
-            // Ici vous pouvez ajouter un fetch() vers une API si besoin.
+            addEvent('contact_submit', 'Formulaire de contact soumis');
             this.reset();
         });
+
+        // --- Journal d'événements: stockage, rendu, toasts ---
+        const STORAGE_KEY = 'siteEvents:v1';
+        let eventStore = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+        function persist() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(eventStore));
+        }
+
+        function formatTime(ts) {
+            return new Date(ts).toLocaleString();
+        }
+
+        function addEvent(type, message, meta = {}) {
+            const ev = { id: Date.now() + Math.random().toString(36).slice(2,8), ts: Date.now(), type, message, meta };
+            eventStore.unshift(ev); // newest first
+            // keep reasonable size
+            if (eventStore.length > 500) eventStore.length = 500;
+            persist();
+            renderEvents();
+            showToast(type, message);
+            return ev;
+        }
+
+        function renderEvents() {
+            const el = document.getElementById('eventList');
+            if (!el) return;
+            el.innerHTML = eventStore.map(ev => {
+                const metaStr = ev.meta && Object.keys(ev.meta).length ? JSON.stringify(ev.meta) : '';
+                return `<div class="event-item" title="${escapeHtml(ev.message)}"><div><strong>[${escapeHtml(ev.type)}]</strong> ${escapeHtml(ev.message)}</div><div class="event-meta">${formatTime(ev.ts)} ${metaStr ? '· '+escapeHtml(metaStr) : ''}</div></div>`;
+            }).join('');
+        }
+
+        function escapeHtml(s){ return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+        function clearLog() {
+            eventStore = [];
+            persist();
+            renderEvents();
+            showToast('log_cleared','Journal effacé');
+        }
+
+        function exportLog() {
+            const blob = new Blob([JSON.stringify(eventStore, null, 2)], {type:'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `events-${new Date().toISOString()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+            showToast('export','Journal exporté');
+        }
+
+        // petits toasts d'info
+        function showToast(type, message, ms = 4000) {
+            const wrap = document.getElementById('toastWrap');
+            if (!wrap) return;
+            const d = document.createElement('div');
+            d.className = 'toast';
+            d.textContent = `${type}: ${message}`;
+            wrap.prepend(d);
+            wrap.setAttribute('aria-hidden','false');
+            setTimeout(()=> {
+                d.style.transition = 'opacity .3s, transform .3s';
+                d.style.opacity = '0';
+                d.style.transform = 'translateY(-8px)';
+            }, ms - 350);
+            setTimeout(()=> { d.remove(); if (!wrap.children.length) wrap.setAttribute('aria-hidden','true'); }, ms);
+        }
+
+        // Exposition globale pour déclencher des événements depuis la console ou d'autres scripts
+        window.reportEvent = addEvent;
+
+        // Boutons simulateurs
+        document.getElementById('simOverheat').addEventListener('click', ()=> addEvent('surchauffe','Surchauffe détectée (simulation)', {level:'critical'}));
+        document.getElementById('simOverload').addEventListener('click', ()=> addEvent('surcharge','Surcharge détectée (simulation)', {queue:'requests', load:95}));
+        document.getElementById('simModify').addEventListener('click', ()=> addEvent('modification','Modification du contenu détectée (simulation)', {path:location.pathname}));
+
+        document.getElementById('clearLog').addEventListener('click', clearLog);
+        document.getElementById('exportLog').addEventListener('click', exportLog);
+
+        // Hooks automatiques utiles
+        window.addEventListener('error', (ev) => {
+            addEvent('error', ev.message, {source: ev.filename, lineno: ev.lineno});
+        });
+
+        window.addEventListener('unhandledrejection', (ev) => {
+            addEvent('promise_rejection', String(ev.reason || 'unknown'), {});
+        });
+
+        window.addEventListener('online', ()=> addEvent('network','Navigateur en ligne'));
+        window.addEventListener('offline', ()=> addEvent('network','Navigateur hors-ligne'));
+        document.addEventListener('visibilitychange', ()=> addEvent('visibility', document.hidden ? 'Page cachée' : 'Page visible'));
+
+        // Observer de modifications DOM (déclenche un évènement consolidé, throttlé)
+        (function(){
+            let timeout;
+            const obs = new MutationObserver(() => {
+                if (timeout) return;
+                timeout = setTimeout(()=> {
+                    addEvent('dom_modify','Modification du DOM détectée');
+                    timeout = null;
+                }, 800);
+            });
+            obs.observe(document.body, { subtree:true, childList:true, attributes:false, characterData:false });
+            // Exposer pour debug si besoin
+            window.__domObserver = obs;
+        })();
+
+        // initial render
+        renderEvents();
+
+        // petit message initial si vide
+        if (!eventStore.length) addEvent('start','Journal démarré');
+
     </script>
 </body>
 </html>
+// ...existing code...

@@ -1,0 +1,13 @@
+
+{
+  "name": "site-test-hacking-legal",
+  "version": "1.0.0",
+  "description": "Serveur de test local pour collecter/formulaire et journaliser",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
