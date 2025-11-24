@@ -3,24 +3,24 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>Page Cyber-Exemple</title>
+    <title>Page Cyber-Exemple - Encodeur</title>
     <style>
-        /* BASE FUTURISTE */
+        /* BASE FUTURISTE (inchangée) */
         :root{
-            --bg: #141b26;      /* Arrière-plan sombre */
-            --card: #0d121b;    /* Cartes encore plus sombres */
-            --accent: #00ffc4;  /* Cyan lumineux (style "néon") */
-            --text: #e6f7ff;    /* Texte très clair */
-            --muted: #5e7087;   /* Gris-bleu pour le texte secondaire */
-            --border: #2c3a50;  /* Bordures subtiles */
-            --glow: 0 0 15px rgba(0, 255, 196, 0.4); /* Effet lumineux */
+            --bg: #141b26;      
+            --card: #0d121b;    
+            --accent: #00ffc4;  
+            --text: #e6f7ff;    
+            --muted: #5e7087;   
+            --border: #2c3a50;  
+            --glow: 0 0 15px rgba(0, 255, 196, 0.4); 
             --radius: 4px;
             --max: 1200px;
         }
         *{box-sizing:border-box}
         body{
             margin:0;
-            font-family:'Courier New', monospace; /* Police monospace pour le style */
+            font-family:'Courier New', monospace; 
             background:var(--bg);
             color:var(--text);
             -webkit-font-smoothing:antialiased;
@@ -84,14 +84,20 @@
         .card h3{margin:0 0 10px; font-size:1.15rem; color:var(--accent);}
         .muted{color:var(--muted); font-size:0.9rem}
 
-        /* FORM */
+        /* FORM / CODE ENCODER STYLES */
+        .encoder-controls{
+            display:flex;
+            gap:10px;
+            margin-top:10px;
+        }
         form{display:grid; gap:12px;}
         input,textarea{
             width:100%;
             padding:12px;
             border:1px solid var(--border);
             border-radius:var(--radius);
-            font:inherit;
+            font-size: 1rem;
+            font-family:'Courier New', monospace; 
             background:var(--bg);
             color:var(--text);
             box-shadow:inset 0 0 5px rgba(0, 255, 196, 0.1);
@@ -102,6 +108,14 @@
             border-color:var(--accent);
             box-shadow:inset 0 0 10px rgba(0, 255, 196, 0.3);
         }
+        .cipher-info{
+            background: var(--bg);
+            border: 1px dashed var(--border);
+            padding: 10px;
+            border-radius: var(--radius);
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
 
         /* FOOTER */
         footer{margin:40px 0 20px; color:var(--muted); text-align:center; font-size:0.85rem; padding-top:15px; border-top:1px dashed var(--border);}
@@ -111,6 +125,7 @@
             .hero{flex-direction:column; align-items:flex-start}
             header{flex-direction:column; align-items:flex-start}
             .wrap{padding:0 15px;}
+            .encoder-controls{flex-direction: column;}
         }
     </style>
 </head>
@@ -127,7 +142,7 @@
                 <ul>
                     <li><a href="#home">/ ACCUEIL</a></li>
                     <li><a href="#features">/ FONCTIONS</a></li>
-                    <li><a href="#contact">/ CONTACT</a></li>
+                    <li><a href="#encoder">/ ENCODEUR</a></li>
                 </ul>
             </nav>
         </header>
@@ -138,45 +153,60 @@
                     <h1>SYSTÈME EN LIGNE OPÉRATIONNEL</h1>
                     <p class="muted">Interface de base pour la navigation. Modifiez les paramètres pour un accès complet.</p>
                     <a class="btn" href="#" target="_blank">ACCÈS PROTOCOLE</a>
-                    <a class="btn" href="#contact" style="background:#4a5568; box-shadow:none;">STATUT CONTACT</a>
+                    <a class="btn" href="#encoder" style="background:#4a5568; box-shadow:none;">OUVRIR ENCODEUR</a>
                 </div>
                 <div style="min-width:180px; text-align:right;">
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 160 120'%3E%3Crect rx='4' width='160' height='120' fill='%231f2937'/%3E%3Cpath d='M 10 30 L 150 30 L 150 100 L 10 100 Z' stroke='%2300ffc4' stroke-width='2' fill='none'/%3E%3Ccircle cx='30' cy='50' r='5' fill='%2300ffc4'/%3E%3Cpath d='M 40 50 L 140 50 M 30 70 L 130 70 M 50 90 L 110 90' stroke='%235e7087' stroke-width='1'/%3E%3Ctext x='80' y='65' font-family='Courier New' font-size='10' fill='%2300ffc4' text-anchor='middle'%3E[DONNÉES CHIFFRÉES]%3C/text%3E%3C/svg%3E" alt="Interface futuriste" aria-hidden="true" style="border-radius:4px;">
                 </div>
             </section>
 
-            <section id="features" class="grid" aria-label="Fonctionnalités">
+            <section id="features" class="grid" aria-label="Fonctionnalités du Système">
                 <article class="card">
-                    <h3>01. CRYPTAGE</h3>
-                    <p class="muted">Structure de code optimisée pour une transmission sécurisée et chiffrée.</p>
+                    <h3>01. AUDIT DE SÉCURITÉ</h3>
+                    <p class="muted">Analyse des dépendances du système et des ports ouverts pour détecter les vulnérabilités.</p>
                 </article>
                 <article class="card">
-                    <h3>02. ADAPTATIF</h3>
-                    <p class="muted">Le protocole s'ajuste dynamiquement à toutes les résolutions d'écran.</p>
+                    <h3>02. TÉLÉMÉTRIE TEMPS RÉEL</h3>
+                    <p class="muted">Surveillance de l'état du réseau (latence, flux de données) avec mise à jour immédiate.</p>
                 </article>
                 <article class="card">
-                    <h3>03. ACCESSIBLE</h3>
-                    <p class="muted">Navigation et interface utilisateur conçues pour une interaction rapide.</p>
+                    <h3>03. CONFIGURATION PAR CLÉ</h3>
+                    <p class="muted">Paramétrage rapide des protocoles via une clé alphanumérique personnalisable (encodeur).</p>
                 </article>
             </section>
 
-            <section id="contact" class="card" aria-labelledby="contact-title">
-                <h3 id="contact-title">CONDUITE DE CONTACT</h3>
-                <form id="contactForm" novalidate>
+            <section id="encoder" class="card" aria-labelledby="encoder-title">
+                <h3 id="encoder-title">ENCODEUR DE SÉQUENCE DE CARACTÈRES</h3>
+                
+                <form id="cipherForm">
                     <label>
-                        <span class="muted">Nom d'utilisateur [ID]</span>
-                        <input type="text" name="name" placeholder="Votre identifiant" required>
+                        <span class="muted">Clé de Transformation Personnalisée (26 caractères)</span>
+                        <input type="text" id="customCipher" placeholder="Par défaut : BCDEFGHIJKLMNOPQRSTUVWXYZ A" maxlength="26" pattern="[A-Za-z]{26}">
                     </label>
+                    <div class="cipher-info">
+                        **Clé Active :** <span id="currentCipherDisplay" class="muted">BCDEFGHIJKLMNOPQRSTUVWXYZ A</span> | **Alphabet :** ABCDEFGHIJKLMNOPQRSTUVWXYZ
+                    </div>
+                    <div class="encoder-controls">
+                        <button type="button" class="btn" id="saveCipher">ACTIVER CLÉ</button>
+                        <button type="button" class="btn" id="resetCipher" style="background:#4a5568; box-shadow:none;">RÉINITIALISER CLÉ</button>
+                    </div>
+                </form>
+
+                <hr style="border-color: var(--border); margin: 20px 0;">
+
+                <form id="codeForm">
                     <label>
-                        <span class="muted">Canal d'accès [EMAIL]</span>
-                        <input type="email" name="email" placeholder="canal@système.com" required>
+                        <span class="muted">Séquence d'Entrée (TEXTE CLAIR)</span>
+                        <textarea id="inputText" rows="4" placeholder="Tapez le message à encoder ici..."></textarea>
                     </label>
+                    <div class="encoder-controls">
+                        <button type="button" class="btn" id="encodeBtn">ENCODER SÉQUENCE</button>
+                        <button type="button" class="btn" id="decodeBtn" style="background:#8b5cf6; box-shadow:0 0 15px rgba(139, 92, 246, 0.4);">DÉCODER SÉQUENCE</button>
+                    </div>
                     <label>
-                        <span class="muted">Transmettre Message [DATA]</span>
-                        <textarea name="message" rows="5" placeholder="Saisir votre transmission ici..."></textarea>
+                        <span class="muted">Séquence de Sortie (CODE TRANSFORMÉ)</span>
+                        <textarea id="outputText" rows="4" readonly placeholder="Le résultat apparaîtra ici..."></textarea>
                     </label>
-                    <button class="btn" type="submit">TRANSMETTRE DONNÉES</button>
-                    <div id="formStatus" class="muted" role="status" aria-live="polite" style="margin-top:8px"></div>
                 </form>
             </section>
         </main>
@@ -189,12 +219,71 @@
     <script>
         document.getElementById('year').textContent = new Date().getFullYear();
 
-        document.getElementById('contactForm').addEventListener('submit', function(e){
-            e.preventDefault();
-            const status = document.getElementById('formStatus');
-            status.textContent = 'Transmission de données simulée. Réponse : [SUCCESS / 200]';
-            this.reset();
+        // --- Logique de l'Encodeur de Code (inchangée) ---
+        
+        const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const DEFAULT_CIPHER = 'BCDEFGHIJKLMNOPQRSTUVWXYZ A';
+        let currentCipher = DEFAULT_CIPHER;
+
+        const customCipherInput = document.getElementById('customCipher');
+        const currentCipherDisplay = document.getElementById('currentCipherDisplay');
+
+        function updateCipherDisplay() {
+            currentCipherDisplay.textContent = currentCipher;
+        }
+
+        function transformText(text, source, target) {
+            let result = '';
+            const upperText = text.toUpperCase();
+            
+            for (let i = 0; i < upperText.length; i++) {
+                const char = upperText[i];
+                const index = source.indexOf(char);
+                
+                if (index !== -1) {
+                    result += target[index];
+                } else {
+                    result += text[i];
+                }
+            }
+            return result;
+        }
+        
+        document.getElementById('encodeBtn').addEventListener('click', () => {
+            const inputText = document.getElementById('inputText').value;
+            const outputText = document.getElementById('outputText');
+            outputText.value = transformText(inputText, ALPHABET, currentCipher);
         });
+
+        document.getElementById('decodeBtn').addEventListener('click', () => {
+            const inputText = document.getElementById('inputText').value;
+            const outputText = document.getElementById('outputText');
+            outputText.value = transformText(inputText, currentCipher, ALPHABET);
+        });
+
+        document.getElementById('saveCipher').addEventListener('click', () => {
+            const newCipher = customCipherInput.value.toUpperCase();
+            const isUnique = new Set(newCipher.replace(/[^A-Z]/g, '')).size === 26;
+            
+            if (newCipher.length === 26 && isUnique) {
+                currentCipher = newCipher;
+                updateCipherDisplay();
+                alert('Clé de chiffrement activée avec succès !');
+            } else {
+                alert('ERREUR : La clé doit être composée de 26 lettres uniques (A-Z) et avoir une longueur exacte de 26.');
+                customCipherInput.value = currentCipher;
+            }
+        });
+
+        document.getElementById('resetCipher').addEventListener('click', () => {
+            currentCipher = DEFAULT_CIPHER;
+            customCipherInput.value = DEFAULT_CIPHER;
+            updateCipherDisplay();
+            alert('Clé de chiffrement réinitialisée à la valeur par défaut.');
+        });
+        
+        customCipherInput.value = DEFAULT_CIPHER;
+        updateCipherDisplay();
     </script>
 </body>
 </html>
