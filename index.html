@@ -12,19 +12,47 @@
         import { getFirestore, doc, addDoc, onSnapshot, collection, query, orderBy, serverTimestamp, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
-        // IMPORTANT : Utilisation des variables globales fournies par l'environnement
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // ====================================================================================
+        // --- FIX POUR GITHUB PAGES ET ENVIRONNEMENT PUBLIC ---
+        // Les identifiants Firebase que vous avez fournis sont intégrés ci-dessous.
+        // ====================================================================================
 
-        // Configuration Firebase
+        // 1. L'ID de l'application est utilisé pour les chemins Firestore.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id-encoder';
+        
+        // 2. CONFIGURATION FIREBASE PUBLIQUE (Vos identifiants spécifiques)
+        // Cette configuration est utilisée lorsque l'application n'est pas dans l'environnement d'aperçu (ex: GitHub Pages).
+        const publicFirebaseConfig = {
+            apiKey: "AIzaSyDsKu6EavK4oEh4F2TS0EoB5HwzMxY7kgU",
+            authDomain: "chat-encode.firebaseapp.com",
+            databaseURL: "https://chat-encode-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "chat-encode",
+            storageBucket: "chat-encode.firebasestorage.app",
+            messagingSenderId: "812767464816",
+            appId: "1:812767464816:web:e46750b8cfda20063c93b5",
+            measurementId: "G-SFLFFQ5HPD"
+        };
+        
+        // Utilisation de la configuration injectée (pour l'aperçu) ou de la configuration publique (pour les pages GitHub).
+        const firebaseConfig = (typeof __firebase_config !== 'undefined' && __firebase_config) 
+                                ? JSON.parse(__firebase_config) 
+                                : publicFirebaseConfig;
+        
+        // 3. Le jeton d'authentification initial est ignoré en environnement public
+        const initialAuthToken = null; 
+        
+        // ====================================================================================
+        // --- FIN DE LA CONFIGURATION ---
+        // ====================================================================================
+
+        // Initialisation de Firebase avec la configuration (publique ou injectée)
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         // setLogLevel('Debug'); // Décommenter pour le debug
 
         let currentUserId = null;
-        let publicAlias = null; // Nouvel alias public
+        let publicAlias = null; 
         let isAuthReady = false;
         
         // Listes pour générer l'alias par défaut
@@ -35,7 +63,7 @@
         
         function generatePublicAlias() {
             const adj = ADJECTIVES[Math.floor(Math.random() * ADJECTIVES.length)];
-            const num = Math.floor(Math.random() * 90) + 10; // Numéro aléatoire à deux chiffres
+            const num = Math.floor(Math.random() * 90) + 10;
             return `${adj}-${num}`;
         }
         
@@ -47,10 +75,8 @@
                 const docSnap = await getDoc(profileDocRef);
                 
                 if (docSnap.exists() && docSnap.data().alias) {
-                    // L'utilisateur a déjà un alias
                     publicAlias = docSnap.data().alias;
                 } else {
-                    // Première connexion, générer et enregistrer un nouvel alias
                     publicAlias = generatePublicAlias();
                     await setDoc(profileDocRef, { 
                         alias: publicAlias,
@@ -58,7 +84,7 @@
                     });
                 }
                 
-                // Mettre à jour l'affichage après avoir trouvé/créé l'alias
+                // Mise à jour de l'interface
                 document.getElementById('currentUserDisplay').textContent = publicAlias;
                 document.getElementById('profileAliasInput').value = publicAlias;
                 document.getElementById('secureIDDisplay').textContent = currentUserId;
@@ -71,7 +97,6 @@
 
             } catch (error) {
                 console.error("Erreur de configuration de l'identité utilisateur:", error);
-                // Utiliser un fallback si Firestore échoue
                 publicAlias = 'ANONYME-FAIL';
                 appendMessage(`[SYSTEM] : Erreur. ID de secours: ${currentUserId.substring(0, 8)}... Statut: EN LIGNE.`, 'system');
                 loadChatMessages();
@@ -79,16 +104,15 @@
             }
         }
 
-        // Connexion à Firebase
+        // Connexion à Firebase - Simplifiée pour l'environnement public
         async function authenticateUser() {
             try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+                // Tente la connexion anonyme par défaut
+                await signInAnonymously(auth);
             } catch (error) {
+                // Cette erreur est corrigée car la clé API est maintenant valide
                 console.error("Erreur d'authentification Firebase:", error);
+                showMessageBox("ERREUR D'AUTH : Vérifiez la console et votre configuration Firebase.");
             }
         }
         
@@ -97,10 +121,9 @@
             isAuthReady = true;
             if (user) {
                 currentUserId = user.uid;
-                window.db = db; // Rendre db disponible globalement pour la logique
-                window.currentUserId = currentUserId; // Rendre l'ID disponible
+                window.db = db;
+                window.currentUserId = currentUserId;
                 
-                // Configurer l'identité (alias)
                 setupUserIdentity(user.uid);
 
             } else {
@@ -173,7 +196,7 @@
             }
         });
 
-        // --- LOGIQUE ENCODEUR ET HISTORIQUE ---
+        // --- LOGIQUE ENCODEUR ET HISTORIQUE (inchangée) ---
         
         const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const ALPHABET_LENGTH = ALPHABET.length;
@@ -634,7 +657,7 @@
             <div class="brand">
                 <span class="logo" aria-hidden="true"></span>
                 <div>
-                    <strong>CYBER-BASE</strong><div class="muted">PROTOCOLE EN LIGNE V6.0 (ALIAS PERSONNALISÉ)</div>
+                    <strong>CYBER-BASE</strong><div class="muted">PROTOCOLE EN LIGNE V6.1 (CLÉS ACTIVES)</div>
                 </div>
             </div>
             <nav aria-label="Navigation principale">
